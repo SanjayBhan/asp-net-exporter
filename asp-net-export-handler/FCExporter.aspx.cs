@@ -300,12 +300,12 @@ public partial class FCExporter : System.Web.UI.Page
 
         //Background color of chart
         meta["bgcolor"] = Request["meta_bgColor"];
-        if (Request["meta_bgColor"] == null || Request["meta_bgColor"].Trim() == "")
+        if (meta["bgcolor"] == null || meta["bgcolor"].ToString().Trim() == "")
         {
             // Send notice if BgColor is not provided
             raise_error(" Background color not specified. Taking White (FFFFFF) as default background color.");
-            // Set White as Default Background color
-            meta["bgcolor"] = meta["bgcolor"].ToString().Trim() == "" ? "FFFFFF" : meta["bgcolor"];
+            // Set White as Default Background color            
+            meta["bgcolor"] = "FFFFFF";           
         }
 
         // DOMId of the chart
