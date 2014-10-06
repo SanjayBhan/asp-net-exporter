@@ -324,14 +324,16 @@ namespace SharpVectors.Renderers.Wpf
             {
                 string textAnchor = _textElement.GetPropertyValue("text-anchor");
 
-                WpfTextAnchor anchor = WpfTextAnchor.None;
+                XmlNodeList nodeList = _svgElement.ChildNodes;
 
+                /*
+                 
+                WpfTextAnchor anchor = WpfTextAnchor.None;
                 if (textAnchor == "middle")
                     anchor = WpfTextAnchor.Middle;
                 else if (textAnchor == "end")
                     anchor = WpfTextAnchor.End;
 
-                XmlNodeList nodeList = _svgElement.ChildNodes;
                 // This is a very simply hack to change centered text to left align, since for
                 // text containing spans, different font weights may be applied to the spans...
                 if (anchor == WpfTextAnchor.Middle)
@@ -400,6 +402,8 @@ namespace SharpVectors.Renderers.Wpf
                     // Resume the rendering...
                     _isMeasuring = false;
                 }
+
+                */
 
                 bool textRendered = false;
 
