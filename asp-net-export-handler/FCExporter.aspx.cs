@@ -117,7 +117,7 @@ public partial class FCExporter : System.Web.UI.Page
     /// 
     /// </summary>
     /// directory where the FCExporter.aspx file recides
-    private const string SAVE_PATH = "../Export/Exported_Images/";
+    private const string SAVE_PATH = "./Exported_Images/";
 
     /// <summary>
     /// IMPORTANT: This constant HTTP_URI stores the HTTP reference to 
