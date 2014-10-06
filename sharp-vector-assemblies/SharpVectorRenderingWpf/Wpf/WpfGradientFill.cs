@@ -156,7 +156,7 @@ namespace SharpVectors.Renderers.Wpf
                             }
                             else
                             {
-                                brush.RelativeTransform = new RotateTransform(45, 0.5, 0.5);
+                                //brush.RelativeTransform = new RotateTransform(45, 0.5, 0.5);
                             }
 
                             //mode = LinearGradientMode.ForwardDiagonal;
