@@ -11,7 +11,7 @@ Requirements
 
 Installation
 ------------
-- Unzip the 'asp-net-export-handler.zip' in your IIS wwwroot folder (e.g. C:\inetpub\wwwroot )
+- Unzip the 'asp-net-export-handler.zip' in your IIS wwwroot folder (e.g. C:\inetpub\wwwroot)
 - Add an application in your server and set physical path to the above folder
 - Set the URL of 'FCExporter.aspx' into the 'exportHandler' attribute in chart XML from the above web application
 - Make sure 'IUSR' has proper read/write permission in the 'Exported_Images' folder
