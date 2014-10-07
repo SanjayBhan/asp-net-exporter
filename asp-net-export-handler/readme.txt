@@ -13,7 +13,7 @@ Installation
 ------------
 - Unzip the 'asp-net-export-handler.zip' in your IIS wwwroot folder (e.g. C:\inetpub\wwwroot)
 - Add an application in your server and set physical path to the above folder
-- Set the URL of 'FCExporter.aspx' into the 'exportHandler' attribute in chart XML from the above web application
+- Set the URL of 'FCExporter.aspx' from the above web application into the chart's 'exportHandler' attribute
 - Make sure 'IUSR' has proper read/write permission in the 'Exported_Images' folder
 - FusionCharts' export request contains some XML data, which is restricted in .NET 4 or above. You may need to add the following configuration in your 'web.config' file:
 <system.web>
