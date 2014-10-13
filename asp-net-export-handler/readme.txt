@@ -1,7 +1,20 @@
 FusionCharts ASP.NET Export Handler
 =====================================
-The FusionCharts ASP.NET Export Handler contains all libraries and components required to build and run a .NET based 
-web application that can be used as a server-side export handler for the export feature of FusionCharts.
+
+What is FusionCharts .NET export handler?
+-----------------------------------------
+FusionCharts Suite XT uses JavaScript to generate charts in the browser, using SVG and VML (for older IE). If you need 
+to export the charts as images or PDF, you need a server-side helper library to convert the SVG to image/PDF. These 
+export handlers allow you to take the SVG from FusionCharts charts and convert to image/PDF.
+
+How does the export handler work?
+---------------------------------
+- A chart is generated in the browser. When the export to image or PDF button is clicked, the chart generates the SVG string 
+   to represent the current state and sends to the export handler. The export handler URL is configured via chart attributes.
+- The export handler accepts the SVG string along with chart configuration like chart type, width, height etc., and uses 
+   SharpVectors library to convert to image or PDF.
+- The export handler either writes the image or PDF to disk, based on the configuration provided by chart, or streams it 
+   back to the browser.
 
 
 Requirements
