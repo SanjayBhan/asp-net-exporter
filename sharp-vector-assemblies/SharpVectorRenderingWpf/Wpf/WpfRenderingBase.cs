@@ -55,7 +55,18 @@ namespace SharpVectors.Renderers.Wpf
 
         public virtual bool NeedRender(WpfDrawingRenderer renderer)
         {
-            if (_svgElement.GetAttribute("display") == "none")
+
+            // FC Fix: Checks if element is visible by checking element's style (display and visiblity)
+            if (_svgElement is SvgStyleableElement)
+            {
+                if (_svgElement.GetAttribute("display").ToLower().Trim().Equals("none") || ((SvgStyleableElement)((SvgElement)_svgElement)).GetPropertyValue("display").ToLower().Trim().Equals("none") || ((SvgStyleableElement)((SvgElement)_svgElement)).GetPropertyValue("visibility").ToLower().Trim().Equals("hidden"))
+                {
+                    return false;
+                }
+            }
+
+            // Original
+            if (_svgElement.GetAttribute("display").ToLower().Trim().Equals("none"))
             {
                 return false;
             }
