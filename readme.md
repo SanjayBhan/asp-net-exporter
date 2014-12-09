@@ -14,7 +14,7 @@ How does the export handler work?
 Version
 ----
 
-1.1
+1.2
 
 Requirements
 -----------
