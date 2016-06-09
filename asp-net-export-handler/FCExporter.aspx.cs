@@ -230,6 +230,24 @@ public partial class FCExporter : System.Web.UI.Page
         flushStatus(exportedStatus, (Hashtable)exportData["meta"]);
 
     }
+    private void convertRAWImageDataToFile(string imageData, string parameters)
+    {
+        string fileName = parameters.Split('|')[0].Split('=')[1],
+               extention = parameters.Split('|')[1].Split('=')[1],
+               exportAction = parameters.Split('|')[2].Split('=')[1],
+               fullFileName = fileName + "." + extention,
+               filLocation = HttpContext.Current.Server.MapPath("~/Exported_Images/" + fullFileName);
+
+        byte[] bytes = System.Convert.FromBase64String(imageData.Split(',')[1]);
+        File.WriteAllBytes(filLocation, bytes);
+        if (exportAction == "download") {
+            Response.ClearContent();
+            Response.AddHeader("Content-Disposition", "attachment; filename=" + fullFileName);
+            Response.ContentType = "text/plain";
+            Response.TransmitFile(filLocation);
+            Response.End();
+        }     
+    }
 
     /// <summary>
     /// Parses POST stream from chart and builds a Hashtable containing 
@@ -247,8 +265,11 @@ public partial class FCExporter : System.Web.UI.Page
         string svgStr = "";
 
         IsSVGData = false;
-
-        if (Request["stream_type"] == "svg")
+        if (Request["stream_type"] == "IMAGE-DATA")
+        {
+            this.convertRAWImageDataToFile(Request["stream"], Request["parameters"]);
+        }
+        else if (Request["stream_type"] == "svg")
         {
             IsSVGData = true;
             exportData["svg"] = Request["stream"];
