@@ -144,14 +144,14 @@ public partial class FCExporter : System.Web.UI.Page
     /// The value is semicolon separated key value pair for each format
     /// Each key is the format and value is the MIME type
     /// </summary>
-    private const string MIMETYPES = "pdf=application/pdf;jpg=image/jpeg;jpeg=image/jpeg;gif=image/gif;png=image/png;svg=image/svg+xml";
+    private const string MIMETYPES = "pdf=application/pdf;jpg=image/jpeg;jpeg=image/jpeg;gif=image/gif;png=image/png;svg=image/svg+xml;xls=application/vnd.ms-excel";
 
     /// <summary>
     /// This is a constant list of all the file extensions for the export formats
     /// The value is semicolon separated key value pair for each format
     /// Each key is the format and value is the file extension 
     /// </summary>
-    private const string EXTENSIONS = "pdf=pdf;jpg=jpg;jpeg=jpg;gif=gif;png=png;svg=svg";
+    private const string EXTENSIONS = "pdf=pdf;jpg=jpg;jpeg=jpg;gif=gif;png=png;svg=svg;xls=xls";
 
     /// <summary>
     /// Lists the default exportParameter values taken, if not provided by chart
@@ -236,14 +236,15 @@ public partial class FCExporter : System.Web.UI.Page
                extention = parameters.Split('|')[1].Split('=')[1],
                exportAction = parameters.Split('|')[2].Split('=')[1],
                fullFileName = fileName + "." + extention,
-               filLocation = HttpContext.Current.Server.MapPath("~/Exported_Images/" + fullFileName);
+               filLocation = HttpContext.Current.Server.MapPath("~/Exported_Images/" + fullFileName),
+               contentType = getMime(extention);
 
         byte[] bytes = System.Convert.FromBase64String(imageData.Split(',')[1]);
         File.WriteAllBytes(filLocation, bytes);
         if (exportAction == "download") {
             Response.ClearContent();
             Response.AddHeader("Content-Disposition", "attachment; filename=" + fullFileName);
-            Response.ContentType = "text/plain";
+            Response.ContentType = contentType;
             Response.TransmitFile(filLocation);
             Response.End();
         }     
