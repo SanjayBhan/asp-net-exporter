@@ -14,7 +14,7 @@ How does the export handler work?
 Version
 ----
 
-1.2.1
+4.0.0
 
 Requirements
 -----------
@@ -32,6 +32,12 @@ Installation
 ```
 <system.web>
 	<httpRuntime requestValidationMode="2.0"/>
+</system.web>
+```
+* JS error is thrown during svg export if any image, present in same domain, is used in chart. You may need to add the following configuration in your 'web.config' file:
+```
+<system.web>
+	<httpRuntime executionTimeout="999999" maxRequestLength="2000000000" requestValidationMode="2.0" />
 </system.web>
 ```
 
