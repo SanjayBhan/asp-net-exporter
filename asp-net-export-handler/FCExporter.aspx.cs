@@ -182,6 +182,8 @@ public partial class FCExporter : System.Web.UI.Page
 
     public bool IsSVGData { get; set; }
 
+    public bool IsLatest;
+
     /// <summary>
     /// Stores SVG information.
     /// </summary>
@@ -208,44 +210,45 @@ public partial class FCExporter : System.Web.UI.Page
 
         // process export data and get the processed data (image/PDF) to be exported
         MemoryStream exportObject = null;
-
-        if (IsSVGData)
+        if (!IsLatest)
         {
-            if (exportData["encodedImgData"] != null && !string.IsNullOrEmpty(exportData["encodedImgData"].ToString()) && ((Hashtable)exportData["parameters"])["exportformat"].ToString() == "svg")
+            if (IsSVGData)
             {
-                exportObject = exportProcessor(((Hashtable)exportData["parameters"])["exportformat"].ToString(), exportData["svg"].ToString(), (Hashtable)exportData["parameters"], exportData["encodedImgData"].ToString());
+                if (exportData["encodedImgData"] != null && !string.IsNullOrEmpty(exportData["encodedImgData"].ToString()) && ((Hashtable)exportData["parameters"])["exportformat"].ToString() == "svg")
+                {
+                    exportObject = exportProcessor(((Hashtable)exportData["parameters"])["exportformat"].ToString(), exportData["svg"].ToString(), (Hashtable)exportData["parameters"], exportData["encodedImgData"].ToString());
+                }
+                else
+                {
+                    exportObject = exportProcessor(((Hashtable)exportData["parameters"])["exportformat"].ToString(), "svg", (Hashtable)exportData["parameters"]);
+
+                }
             }
             else
             {
-                exportObject = exportProcessor(((Hashtable)exportData["parameters"])["exportformat"].ToString(), "svg", (Hashtable)exportData["parameters"]);
-
+                exportObject = exportProcessor(((Hashtable)exportData["parameters"])["exportformat"].ToString(), exportData["stream"].ToString(), (Hashtable)exportData["meta"]);
             }
+
+
+            /*
+             * Send the export binary to output module which would either save to a server directory
+             * or send the export file to download. Download terminates the process while
+             * after save the output module sends back export status 
+             */
+            //object exportedStatus = IsSVGData ? outputExportObject(exportObject, exportData) : outputExportObject(exportObject, (Hashtable)exportData["parameters"]);
+            object exportedStatus = outputExportObject(exportObject, (Hashtable)exportData["parameters"]);
+
+            // Dispose export object
+            exportObject.Close();
+            exportObject.Dispose();
+
+            /*
+             * Build Appropriate Export Status and send back to chart by flushing the  
+             * procesed status to http response. This returns status back to chart. 
+             * [ This is not applicable when Download action took place ]
+             */
+            flushStatus(exportedStatus, (Hashtable)exportData["meta"]);
         }
-        else
-        {
-            exportObject = exportProcessor(((Hashtable)exportData["parameters"])["exportformat"].ToString(), exportData["stream"].ToString(), (Hashtable)exportData["meta"]);
-        }
-
-
-        /*
-         * Send the export binary to output module which would either save to a server directory
-         * or send the export file to download. Download terminates the process while
-         * after save the output module sends back export status 
-         */
-        //object exportedStatus = IsSVGData ? outputExportObject(exportObject, exportData) : outputExportObject(exportObject, (Hashtable)exportData["parameters"]);
-        object exportedStatus = outputExportObject(exportObject, (Hashtable)exportData["parameters"]);
-
-        // Dispose export object
-        exportObject.Close();
-        exportObject.Dispose();
-
-        /*
-         * Build Appropriate Export Status and send back to chart by flushing the  
-         * procesed status to http response. This returns status back to chart. 
-         * [ This is not applicable when Download action took place ]
-         */
-        flushStatus(exportedStatus, (Hashtable)exportData["meta"]);
-
     }
     private void convertRAWImageDataToFile(string imageData, string parameters)
     {
@@ -291,6 +294,7 @@ public partial class FCExporter : System.Web.UI.Page
         if (Request["stream_type"] == "IMAGE-DATA")
         {
             this.convertRAWImageDataToFile(Request["stream"], Request["parameters"]);
+            IsLatest = true;
         }
         else if (Request["stream_type"] == "svg")
         {
