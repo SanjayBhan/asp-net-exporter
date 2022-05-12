@@ -1,18 +1,18 @@
-﻿/**
+﻿ /**
  *
- * FusionCharts Exporter is an ASP.NET C# script that handles 
+ * FusionCharts Exporter is an ASP.NET C# script that handles
  * FusionCharts (since v3.1) Server Side Export feature.
- * This in conjuncture with various export classes would 
- * process FusionCharts Export Data POSTED to it from FusionCharts 
- * and convert the data to image or PDF and subsequently save to the 
+ * This in conjuncture with various export classes would
+ * process FusionCharts Export Data POSTED to it from FusionCharts
+ * and convert the data to image or PDF and subsequently save to the
  * server or response back as http response to client side as download.
  *
- * This script might be called as the FusionCharts Exporter - main module 
+ * This script might be called as the FusionCharts Exporter - main module
  *
  *    @author FusionCharts
  *    @description FusionCharts Exporter (Server-Side - ASP.NET C#)
  *    @version 4.0 [ 21 June 2016 ]
- *  
+ *
  */
 /**
  *  ChangeLog / Version History:
@@ -28,8 +28,8 @@
  *
  *   3.0 [ 18 July 2014 ]
  *       - Support for JavaScript Chart (SVG)
- *       
- *   2.0 [ 12 February 2009 ] 
+ *
+ *   2.0 [ 12 February 2009 ]
  *       - Integrated with new Export feature of FusionCharts 3.1
  *       - can save to server side directory
  *       - can provide download or open in popup window.
@@ -42,18 +42,18 @@
  */
 /**
  * Copyright (c) 2016 InfoSoft Global Private Limited. All Rights Reserved
- * 
+ *
  */
 /**
  *  GENERAL NOTES
  *  -------------
  *
- *  Chart would POST export data (which consists of encoded image data stream,  
- *  width, height, background color and various other export parameters like 
- *  exportFormat, exportFileName, exportAction, exportTargetWindow) to this script. 
- *  
- *  The script would process this data using appropriate resource classes & build 
- *  export binary (PDF/image) 
+ *  Chart would POST export data (which consists of encoded image data stream,
+ *  width, height, background color and various other export parameters like
+ *  exportFormat, exportFileName, exportAction, exportTargetWindow) to this script.
+ *
+ *  The script would process this data using appropriate resource classes & build
+ *  export binary (PDF/image)
  *
  *  It either saves the binary as file to a server side directory or push it as
  *  Download to client side.
@@ -63,13 +63,13 @@
  *  ------
  *   Q. What if someone wishes to open in the same page where the chart existed as postback
  *      replacing the old page?
- * 
+ *
  *   A. Not directly supported using any chart attribute or parameter but can do by
  *      removing/commenting the line containing 'header( content-disposition ...'
- *     
+ *
  */
 /**
- * 
+ *
  *   @requires	FCIMGGenerator  Class to export FusionCharts image data to JPG, PNG, GIF binary
  *   @requires  FCPDFGenerator  Class to export FusionCharts image data to PDF binary
  *
@@ -87,58 +87,58 @@ using System.Web.Script.Serialization;
 using System.Collections.Generic;
 
 /// <summary>
-/// FusionCharts Exporter is an ASP.NET C# script that handles 
+/// FusionCharts Exporter is an ASP.NET C# script that handles
 /// FusionCharts (since v3.1) Server Side Export feature.
-/// This in conjuncture with other resource classses would 
-/// process FusionCharts Export Data POSTED to it from FusionCharts 
-/// and convert the data to an image or a PDF. Subsequently, it would save 
+/// This in conjuncture with other resource classses would
+/// process FusionCharts Export Data POSTED to it from FusionCharts
+/// and convert the data to an image or a PDF. Subsequently, it would save
 /// to the server or respond back as an HTTP response to client side as download.
-/// 
+///
 /// This script might be called as the FusionCharts Exporter - main module
 /// </summary>
-/// 
+///
 public partial class FCExporter : System.Web.UI.Page
 {
 
 
     /// <summary>
-    /// IMPORTANT: You need to change the location of folder where 
-    /// the exported chart images/PDFs will be saved on your 
-    /// server. Please specify the path to a folder with 
-    /// write permissions in the constant SAVE_PATH below. 
-    /// 
-    /// Please provide the path as per ASP.NET path conventions. 
+    /// IMPORTANT: You need to change the location of folder where
+    /// the exported chart images/PDFs will be saved on your
+    /// server. Please specify the path to a folder with
+    /// write permissions in the constant SAVE_PATH below.
+    ///
+    /// Please provide the path as per ASP.NET path conventions.
     /// You can use relative or  absolute path.
-    /// 
-    /// Special Cases: 
+    ///
+    /// Special Cases:
     ///     '/' means 'wwwroot' directory.
     ///     '. /' ( without the space after .) is the directory where the FCExporter.aspx file recides.
-    ///     
+    ///
     /// Absolute Path :
-    /// 
-    ///     can be like this : "C:\\myFolders\\myImages" 
+    ///
+    ///     can be like this : "C:\\myFolders\\myImages"
     ///     ( Please never use single backslash as that would stop execution of the code instantly)
     ///     or "C:/myFolders/myImages"
-    /// 
+    ///
     ///     You may have a // or \ at end : "C:\\myFolders\\myImages\\"  or "C:/myFolders/myImages/"
-    /// 
-    ///     You can also have mixed slashes : "C:\\myFolders/myImages" 
-    ///     
-    /// 
+    ///
+    ///     You can also have mixed slashes : "C:\\myFolders/myImages"
+    ///
+    ///
     /// </summary>
     /// directory where the FCExporter.aspx file recides
     private const string SAVE_PATH = "./Exported_Images/";
 
     /// <summary>
-    /// IMPORTANT: This constant HTTP_URI stores the HTTP reference to 
-    /// the folder where exported charts will be saved. 
-    /// Please enter the HTTP representation of that folder 
+    /// IMPORTANT: This constant HTTP_URI stores the HTTP reference to
+    /// the folder where exported charts will be saved.
+    /// Please enter the HTTP representation of that folder
     /// in this constant e.g., http://www.yourdomain.com/images/
     /// </summary>
     private const string HTTP_URI = "Exported_Images/";
 
     /// <summary>
-    /// OVERWRITEFILE sets whether the export handler would overwrite an existing file 
+    /// OVERWRITEFILE sets whether the export handler would overwrite an existing file
     /// the newly created exported file. If it is set to false the export handler would
     /// not overwrite. In this case, if INTELLIGENTFILENAMING is set to true the handler
     /// would add a suffix to the new file name. The suffix is a randomly generated GUID.
@@ -159,7 +159,7 @@ public partial class FCExporter : System.Web.UI.Page
     /// <summary>
     /// This is a constant list of all the file extensions for the export formats
     /// The value is semicolon separated key value pair for each format
-    /// Each key is the format and value is the file extension 
+    /// Each key is the format and value is the file extension
     /// </summary>
     private const string EXTENSIONS = "pdf=pdf;jpg=jpg;jpeg=jpg;gif=gif;png=png;svg=svg;xls=xls";
 
@@ -169,7 +169,7 @@ public partial class FCExporter : System.Web.UI.Page
     private const string DEFAULTPARAMS = "exportfilename=FusionCharts;exportformat=PDF;exportaction=download;exporttargetwindow=_self";
 
     /// <summary>
-    /// Stores server notices, if any as string [ to be sent back to chart after save ] 
+    /// Stores server notices, if any as string [ to be sent back to chart after save ]
     /// </summary>
     private string notices = "";
     /// <summary>
@@ -235,7 +235,7 @@ public partial class FCExporter : System.Web.UI.Page
             /*
              * Send the export binary to output module which would either save to a server directory
              * or send the export file to download. Download terminates the process while
-             * after save the output module sends back export status 
+             * after save the output module sends back export status
              */
             //object exportedStatus = IsSVGData ? outputExportObject(exportObject, exportData) : outputExportObject(exportObject, (Hashtable)exportData["parameters"]);
             object exportedStatus = outputExportObject(exportObject, (Hashtable)exportData["parameters"]);
@@ -245,14 +245,14 @@ public partial class FCExporter : System.Web.UI.Page
             exportObject.Dispose();
 
             /*
-             * Build Appropriate Export Status and send back to chart by flushing the  
-             * procesed status to http response. This returns status back to chart. 
+             * Build Appropriate Export Status and send back to chart by flushing the
+             * procesed status to http response. This returns status back to chart.
              * [ This is not applicable when Download action took place ]
              */
             flushStatus(exportedStatus, (Hashtable)exportData["meta"]);
         }
     }
-    private void convertRAWImageDataToFile(string imageData, string parameters)
+    private void convertRAWImageDataToFile(string imageData, string parameters, Hashtable meta)
     {
         string fileName = parameters.Split('|')[0].Split('=')[1],
                extention = parameters.Split('|')[1].Split('=')[1],
@@ -261,15 +261,26 @@ public partial class FCExporter : System.Web.UI.Page
                filLocation = HttpContext.Current.Server.MapPath("~/Exported_Images/" + fullFileName),
                contentType = getMime(extention);
 
-        byte[] bytes = System.Convert.FromBase64String(imageData.Split(',')[1]);
-        File.WriteAllBytes(filLocation, bytes);
+        if (extention.ToLower() == "pdf" && imageData.Split(',')[0].ToLower().IndexOf("image/jpeg") != -1) {
+            meta["exportfilename"] = fileName;
+            meta["exportformat"] = "pdf";
+            var exportObject = exportProcessor("pdf", imageData, meta);
+            object exportedStatus = outputExportObject(exportObject, parseParams(parameters));
+            exportObject.Close();
+            exportObject.Dispose();
+        }
+        else {
+            byte[] bytes = System.Convert.FromBase64String(imageData.Split(',')[1]);
+            File.WriteAllBytes(filLocation, bytes);
+        }
+
         if (exportAction == "download") {
             Response.ClearContent();
             Response.AddHeader("Content-Disposition", "attachment; filename=" + fullFileName);
             Response.ContentType = contentType;
             Response.TransmitFile(filLocation);
             Response.End();
-        }     
+        }
     }
 
     private string stichImageToSVGAndGetString(string svgData, string imageData)
@@ -278,11 +289,11 @@ public partial class FCExporter : System.Web.UI.Page
     }
 
     /// <summary>
-    /// Parses POST stream from chart and builds a Hashtable containing 
+    /// Parses POST stream from chart and builds a Hashtable containing
     /// export data and parameters in a format readable by other functions.
-    ///  The Hashtable contains keys 'stream' (contains encoded 
+    ///  The Hashtable contains keys 'stream' (contains encoded
     /// image data) ; 'meta' ( Hashtable with 'width', 'height' and 'bgColor' keys) ;
-    /// and 'parameters' ( Hashtable of all export parameters from chart as keys, like - exportFormat, 
+    /// and 'parameters' ( Hashtable of all export parameters from chart as keys, like - exportFormat,
     /// exportFileName, exportAction etc.)
     /// </summary>
     /// <returns>Hashtable of processed export data and parameters.</returns>
@@ -295,7 +306,6 @@ public partial class FCExporter : System.Web.UI.Page
         IsSVGData = false;
         if (Request["stream_type"] == "IMAGE-DATA")
         {
-            this.convertRAWImageDataToFile(Request["stream"], Request["parameters"]);
             IsLatest = true;
         }
         else if (Request["stream_type"] == "svg")
@@ -336,7 +346,7 @@ public partial class FCExporter : System.Web.UI.Page
             }
         }
         // If Flash Charts
-        else 
+        else
         {
             //String of compressed image data
             exportData["stream"] = Request["stream"];
@@ -347,7 +357,7 @@ public partial class FCExporter : System.Web.UI.Page
             //Get all export parameters into a Hastable
             Hashtable parameters = parseParams(Request["parameters"]);
             exportData["parameters"] = parameters;
-  
+
         }
 
         //get width and height of the chart
@@ -368,8 +378,8 @@ public partial class FCExporter : System.Web.UI.Page
         {
             // Send notice if BgColor is not provided
             raise_error(" Background color not specified. Taking White (FFFFFF) as default background color.");
-            // Set White as Default Background color            
-            meta["bgcolor"] = "FFFFFF";           
+            // Set White as Default Background color
+            meta["bgcolor"] = "FFFFFF";
         }
 
         // DOMId of the chart
@@ -377,6 +387,10 @@ public partial class FCExporter : System.Web.UI.Page
         DOMId = meta["DOMId"].ToString();
 
         exportData["meta"] = meta;
+
+        if (Request["stream_type"] == "IMAGE-DATA") {
+            this.convertRAWImageDataToFile(Request["stream"], Request["parameters"], meta);
+        }
 
         return exportData;
     }
@@ -413,7 +427,7 @@ public partial class FCExporter : System.Web.UI.Page
     //  </summary>
     //  <param name="imageData">(Dictionary<string, Dictionary<string, string>>) all image Image data as a combined object</param>
     //  <param name="imageName">(string) Image Name</param>
-    //  <returns></returns> 
+    //  <returns></returns>
     private string getImageData(Dictionary<string, Dictionary<string, string>> imageData, string imageName)
     {
         string data = "";
@@ -431,7 +445,7 @@ public partial class FCExporter : System.Web.UI.Page
     }
 
     /// <summary>
-    /// Parse export 'parameters' string into a Hashtable 
+    /// Parse export 'parameters' string into a Hashtable
     /// Also synchronise default values from defaultparameterValues Hashtable
     /// </summary>
     /// <param name="strParams">A string with parameters (key=value pairs) separated  by | (pipe)</param>
@@ -457,7 +471,7 @@ public partial class FCExporter : System.Web.UI.Page
         }
 
         // set a global flag which denotes whether the export is download or not
-        // this is needed in many a functions 
+        // this is needed in many a functions
         isDownload = parameters["exportaction"].ToString().ToLower() == "download";
 
 
@@ -595,10 +609,10 @@ public partial class FCExporter : System.Web.UI.Page
     /// Checks whether the export action is download or save.
     /// If action is 'download', send export parameters to 'setupDownload' function.
     /// If action is not-'download', send export parameters to 'setupServer' function.
-    /// In either case it gets exportSettings and passes the settings along with 
+    /// In either case it gets exportSettings and passes the settings along with
     /// processed export binary (image/PDF) to the output handler function if the
     /// export settings return a 'ready' flag set to 'true' or 'download'. The export
-    /// process would stop here if the action is 'download'. In the other case, 
+    /// process would stop here if the action is 'download'. In the other case,
     /// it gets back success status from output handler function and returns it.
     /// </summary>
     /// <param name="exportObj">Export binary/object in memery stream</param>
@@ -643,7 +657,7 @@ public partial class FCExporter : System.Web.UI.Page
                 status = false;
             }
 
-            
+
             if (isDownload)
             {
                 // If 'download'- terminate imediately
@@ -707,14 +721,14 @@ public partial class FCExporter : System.Web.UI.Page
         // get status
         bool status = (filename is string ? true : false);
 
-        // add notices 
+        // add notices
         if (notices.Trim() != "") arrStatus.Add("notice=" + notices.Trim());
 
         // DOMId of the chart
         arrStatus.Add("DOMId=" + (meta["DOMId"]==null? DOMId : meta["DOMId"].ToString()));
-        
+
         // add width and height
-        // provide 0 as width and height on failure	
+        // provide 0 as width and height on failure
         if (meta["width"] == null) meta["width"] = "0";
         if (meta["height"] == null) meta["height"] = "0";
         arrStatus.Add("height=" + (status ? meta["height"].ToString() : "0"));
@@ -732,9 +746,9 @@ public partial class FCExporter : System.Web.UI.Page
 
     /// <summary>
     /// Builds response from an array of status information. Joins the array to a string.
-    /// Each array element should be a string which is a key=value pair. This array are either joined by 
+    /// Each array element should be a string which is a key=value pair. This array are either joined by
     /// a & to build a querystring (to pass to chart) or joined by a HTML <BR> to show neat
-    /// and clean status informaton in Browser window if download fails at the processing stage. 
+    /// and clean status informaton in Browser window if download fails at the processing stage.
     /// </summary>
     /// <param name="arrMsg">Array of string containing status data as [key=value ]</param>
     /// <returns>A string to be written to output stream</returns>
@@ -759,7 +773,7 @@ public partial class FCExporter : System.Web.UI.Page
 
     }
     /// <summary>
-    /// check server permissions and settings and return ready flag to exportSettings 
+    /// check server permissions and settings and return ready flag to exportSettings
     /// </summary>
     /// <param name="exportParams">Various export parameters</param>
     /// <returns>Hashtable containing various export settings</returns>
@@ -768,11 +782,11 @@ public partial class FCExporter : System.Web.UI.Page
 
         //get export file name
         string exportFile = exportParams["exportfilename"].ToString();
-        // get extension related to specified type 
+        // get extension related to specified type
         string ext = getExtension(exportParams["exportformat"].ToString());
 
         Hashtable retServerStatus = new Hashtable();
-        
+
         //set server status to true by default
         retServerStatus["ready"] = true;
 
@@ -812,7 +826,7 @@ public partial class FCExporter : System.Web.UI.Page
         if (!File.Exists(path + retServerStatus["filepath"].ToString()))
         {
             // need to create a new file if does not exists
-            // need to check whether the directory is writable to create a new file  
+            // need to check whether the directory is writable to create a new file
             if (dirWritable)
             {
                 // if directory is writable return with ready flag
@@ -831,10 +845,10 @@ public partial class FCExporter : System.Web.UI.Page
             }
         }
 
-        // add notice that file exists 
+        // add notice that file exists
         raise_error(" File already exists.");
 
-        //if overwrite is on return with ready flag 
+        //if overwrite is on return with ready flag
         if (OVERWRITEFILE)
         {
             // add notice while trying to overwrite
@@ -845,7 +859,7 @@ public partial class FCExporter : System.Web.UI.Page
             if ((new FileInfo(path + retServerStatus["filepath"].ToString())).IsReadOnly)
                 raise_error(" Overwrite forbidden. File cannot be overwritten.", true);
 
-            // if writable return with ready flag 
+            // if writable return with ready flag
             // open the output file in FileStream
             // set the output stream to the FileStream object
             fos = File.Open(path + retServerStatus["filepath"].ToString(), FileMode.Create, FileAccess.Write);
@@ -853,20 +867,20 @@ public partial class FCExporter : System.Web.UI.Page
             return retServerStatus;
         }
 
-        // raise error and halt execution when overwrite is off and intelligent naming is off 
+        // raise error and halt execution when overwrite is off and intelligent naming is off
         if (!INTELLIGENTFILENAMING)
         {
             raise_error(" Export handler's Overwrite setting is off. Cannot overwrite.", true);
         }
 
         raise_error(" Using intelligent naming of file by adding an unique suffix to the exising name.");
-        // Intelligent naming 
+        // Intelligent naming
         // generate new filename with additional suffix
         exportFile = exportFile + "_" + generateIntelligentFileId();
         retServerStatus["filepath"] = exportFile + "." + ext;
 
         // return intelligent file name with ready flag
-        // need to check whether the directory is writable to create a new file  
+        // need to check whether the directory is writable to create a new file
         if (dirWritable)
         {
             // if directory is writable return with ready flag
@@ -886,20 +900,20 @@ public partial class FCExporter : System.Web.UI.Page
             raise_error("403", true);
         }
 
-        // in any unknown case the export should not execute	
+        // in any unknown case the export should not execute
         retServerStatus["ready"] = false;
         raise_error(" Not exported due to unknown reasons.");
         return retServerStatus;
 
     }
     /// <summary>
-    /// setup download headers and return ready flag in exportSettings 
+    /// setup download headers and return ready flag in exportSettings
     /// </summary>
     /// <param name="exportParams">Various export parameters</param>
     /// <returns>Hashtable containing various export settings</returns>
     private Hashtable setupDownload(Hashtable exportParams)
     {
-        
+
         //get export filename
         string exportFile = exportParams["exportfilename"].ToString();
         //get extension
@@ -909,13 +923,13 @@ public partial class FCExporter : System.Web.UI.Page
         // get target window
         string target = exportParams["exporttargetwindow"].ToString().ToLower();
 
-        // set content-type header 
+        // set content-type header
         Response.ContentType = mime;
 
-        // set content-disposition header 
+        // set content-disposition header
         // when target is _self the type is 'attachment'
         // when target is other than self type is 'inline'
-        // NOTE : you can comment this line in order to replace present window (_self) content with the image/PDF  
+        // NOTE : you can comment this line in order to replace present window (_self) content with the image/PDF
         Response.AddHeader("Content-Disposition", (target == "_self" ? "attachment" : "inline") + "; filename=\"" + exportFile + "." + ext + "\"");
 
         // return exportSetting array. 'Ready' key should be set to 'download'
@@ -929,18 +943,18 @@ public partial class FCExporter : System.Web.UI.Page
     }
 
     /// <summary>
-    ///  gets file extension checking the export type. 
+    ///  gets file extension checking the export type.
     /// </summary>
     /// <param name="exportType">(string) export format</param>
     /// <returns>string extension name</returns>
     private string getExtension(string exportType)
     {
-        // get a Hashtable array of [type=> extension] 
-        // from EXTENSIONS constant 
+        // get a Hashtable array of [type=> extension]
+        // from EXTENSIONS constant
         Hashtable extensionList = bang(EXTENSIONS);
         exportType = exportType.ToLower();
 
-        // if extension type is present in $extensionList return it, otherwise return the type 
+        // if extension type is present in $extensionList return it, otherwise return the type
         return (extensionList[exportType].ToString() != null ? extensionList[exportType].ToString() : exportType);
     }
     /// <summary>
@@ -950,8 +964,8 @@ public partial class FCExporter : System.Web.UI.Page
     /// <returns>Mime type as stirng</returns>
     private string getMime(string exportType)
     {
-        // get a Hashtable array of [type=> extension] 
-        // from MIMETYPES constant 
+        // get a Hashtable array of [type=> extension]
+        // from MIMETYPES constant
         Hashtable mimelist = bang(MIMETYPES);
         string ext = getExtension(exportType);
 
@@ -961,7 +975,7 @@ public partial class FCExporter : System.Web.UI.Page
     }
 
     /// <summary>
-    /// generates a file suffix for a existing file name to apply smart file naming 
+    /// generates a file suffix for a existing file name to apply smart file naming
     /// </summary>
     /// <returns>a string containing GUID and random number /timestamp</returns>
     private string generateIntelligentFileId()
@@ -969,7 +983,7 @@ public partial class FCExporter : System.Web.UI.Page
         // Generate Guid
         string guid = System.Guid.NewGuid().ToString("D");
 
-        // check FILESUFFIXFORMAT type 
+        // check FILESUFFIXFORMAT type
         if (FILESUFFIXFORMAT.ToLower() == "timestamp")
         {
             // Add time stamp with file name
@@ -986,7 +1000,7 @@ public partial class FCExporter : System.Web.UI.Page
 
 
     /// <summary>
-    /// Helper function that splits a string containing delimiter separated key value pairs 
+    /// Helper function that splits a string containing delimiter separated key value pairs
     /// into hashtable
     /// </summary>
     /// <param name="str">delimiter separated key value pairs</param>
@@ -1028,7 +1042,7 @@ public partial class FCExporter : System.Web.UI.Page
     /// <summary>
     /// Error reporter function that has a list of error messages. It can terminate the execution
     /// and send successStatus=0 along with a error message. It can also append notice to a global variable
-    /// and continue execution of the program. 
+    /// and continue execution of the program.
     /// </summary>
     /// <param name="msg">error code as Integer (referring to the index of the errMessages
     /// array containing list of error messages) OR, it can be a string containing the error message/notice</param>
@@ -1072,9 +1086,9 @@ public partial class FCExporter : System.Web.UI.Page
 
 /// <summary>
 /// FusionCharts Image Generator Class
-/// FusionCharts Exporter - 'Image Resource' handles 
+/// FusionCharts Exporter - 'Image Resource' handles
 /// FusionCharts (since v3.1) Server Side Export feature that
-/// helps FusionCharts exported as Image files in various formats. 
+/// helps FusionCharts exported as Image files in various formats.
 /// </summary>
 public class FCIMGGenerator
 {
@@ -1082,7 +1096,7 @@ public class FCIMGGenerator
     private ArrayList arrExportData = new ArrayList();
     //stores number of pages = length of $arrExportData array
     private int numPages = 0;
-	
+
 
 	/// <summary>
 	/// Generates bitmap data for the image from a FusionCharts export format
@@ -1093,7 +1107,7 @@ public class FCIMGGenerator
     {
         setBitmapData(imageData_FCFormat, width, height, bgcolor);
     }
-	
+
 	/// <summary>
 	/// Gets the binary data stream of the image
 	/// The passed parameter determines the file format of the image
@@ -1101,13 +1115,13 @@ public class FCIMGGenerator
 	/// </summary>
     public MemoryStream getBinaryStream(string strFormat)
     {
-		
-		// the image object 
+
+		// the image object
         Bitmap exportObj = getImageObject();
-		
+
 		// initiates a new binary data sream
         MemoryStream outStream = new MemoryStream();
-		
+
 		// determines the image format
         switch (strFormat)
         {
@@ -1133,8 +1147,8 @@ public class FCIMGGenerator
         return outStream;
 
     }
-	
-	
+
+
 	/// <summary>
 	/// Generates bitmap data for the image from a FusionCharts export format
 	/// the height and width of the original export needs to be specified
@@ -1150,7 +1164,7 @@ public class FCIMGGenerator
         arrExportData.Add(chartExportData);
         numPages++;
     }
-	
+
 	/// <summary>
 	/// Generates bitmap data for the image from a FusionCharts export format
 	/// the height and width of the original export needs to be specified
@@ -1173,14 +1187,14 @@ public class FCIMGGenerator
 
         for (int yPixel = 0; yPixel < rows.Length; yPixel++)
         {
-            //Split each row into 'color_count' columns.			
+            //Split each row into 'color_count' columns.
             String[] color_count = rows[yPixel].Split(',');
             //Set horizontal row index to 0
             int xPixel = 0;
 
             for (int col = 0; col < color_count.Length; col++)
             {
-                //Now, if it's not empty, we process it				
+                //Now, if it's not empty, we process it
                 //Split the 'color_count' into color and repeat factor
                 String[] split_data = color_count[col].Split('_');
 
@@ -1226,7 +1240,7 @@ public class FCIMGGenerator
 }
 
 /// <summary>
-/// FusionCharts Exporter - 'PDF Resource' handles 
+/// FusionCharts Exporter - 'PDF Resource' handles
 /// FusionCharts (since v3.1) Server Side Export feature that
 /// helps FusionCharts exported as PDF file.
 /// </summary>
@@ -1278,7 +1292,7 @@ public class FCJSPDFGenerator
 
     }
 
-    //create image PDF object containing the chart image 
+    //create image PDF object containing the chart image
     private byte[] addImageToPDF(int id, bool isCompressed)
     {
 
@@ -1458,7 +1472,7 @@ public class FCJSPDFGenerator
 }
 
 /// <summary>
-/// FusionCharts Exporter - 'PDF Resource' handles 
+/// FusionCharts Exporter - 'PDF Resource' handles
 /// FusionCharts (since v3.1) Server Side Export feature that
 /// helps FusionCharts exported as PDF file.
 /// </summary>
@@ -1469,7 +1483,7 @@ public class FCPDFGenerator
     private ArrayList arrExportData = new ArrayList();
     //stores number of pages = length of $arrExportData array
     private int numPages = 0;
-	
+
 	/// <summary>
 	/// Generates a PDF file with the given parameters
 	/// The imageData_FCFormat parameter is the FusionCharts export format data
@@ -1480,7 +1494,7 @@ public class FCPDFGenerator
     {
         setBitmapData(imageData_FCFormat, width, height, bgcolor);
     }
-	
+
 	/// <summary>
 	/// Gets the binary data stream of the image
 	/// The passed parameter determines the file format of the image
@@ -1516,7 +1530,7 @@ public class FCPDFGenerator
 
 
 
-    //create image PDF object containing the chart image 
+    //create image PDF object containing the chart image
     private byte[] addImageToPDF(int id, bool isCompressed)
     {
 
@@ -1691,56 +1705,79 @@ public class FCPDFGenerator
         string rawImageData = getMeta("imagedata", id);
         string bgColor = getMeta("bgcolor", id);
 
-        MemoryStream imageData24 = new MemoryStream();
+        byte[] imageBytes = null;
 
-        // Split the data into rows using ; as separator
-        string[] rows = rawImageData.Split(';');
-
-        for (int yPixel = 0; yPixel < rows.Length; yPixel++)
-        {
-            //Split each row into 'color_count' columns.			
-            string[] color_count = rows[yPixel].Split(',');
-
-            for (int col = 0; col < color_count.Length; col++)
+        if (rawImageData.IndexOf("base64") != -1) {
+            byte[] imageBytesBuffer = System.Convert.FromBase64String(rawImageData.Split(',')[1]);
+            using (var byteStream = new MemoryStream(imageBytesBuffer))
             {
-                //Now, if it's not empty, we process it				
-                //Split the 'color_count' into color and repeat factor
-                string[] split_data = color_count[col].Split('_');
-
-                //Reference to color
-                string hexColor = split_data[0] != "" ? split_data[0] : bgColor;
-                //If the hexadecimal code is less than 6 characters, pad with 0
-                hexColor = hexColor.Length < 6 ? hexColor.PadLeft(6, '0') : hexColor;
-
-                //refer to repeat factor
-                int fRepeat = int.Parse(split_data[1]);
-
-                // convert color string to byte[] array
-                byte[] rgb = hexToBytes(hexColor);
-
-                // Set the repeated pixel in MemoryStream
-                for (int cRepeat = 0; cRepeat < fRepeat; cRepeat++)
+                using (var imageStream = new MemoryStream())
                 {
-                    imageData24.Write(rgb, 0, 3);
+                    var image = Image.FromStream(byteStream);
+                    image.RotateFlip(RotateFlipType.Rotate180FlipX);
+                    image.Save(imageStream, ImageFormat.Bmp);
+                    imageBytes = imageStream.ToArray();
                 }
-
             }
         }
+        else {
+            MemoryStream imageData24 = new MemoryStream();
 
-        int len = (int)imageData24.Length;
-        imageData24.Close();
+            // Split the data into rows using ; as separator
+            string[] rows = rawImageData.Split(';');
+
+            for (int yPixel = 0; yPixel < rows.Length; yPixel++)
+            {
+                //Split each row into 'color_count' columns.
+            //Split each row into 'color_count' columns.			
+                //Split each row into 'color_count' columns.
+                string[] color_count = rows[yPixel].Split(',');
+
+                for (int col = 0; col < color_count.Length; col++)
+                {
+                    //Now, if it's not empty, we process it
+                //Now, if it's not empty, we process it				
+                    //Now, if it's not empty, we process it
+                    //Split the 'color_count' into color and repeat factor
+                    string[] split_data = color_count[col].Split('_');
+
+                    //Reference to color
+                    string hexColor = split_data[0] != "" ? split_data[0] : bgColor;
+                    //If the hexadecimal code is less than 6 characters, pad with 0
+                    hexColor = hexColor.Length < 6 ? hexColor.PadLeft(6, '0') : hexColor;
+
+                    //refer to repeat factor
+                    int fRepeat = int.Parse(split_data[1]);
+
+                    // convert color string to byte[] array
+                    byte[] rgb = hexToBytes(hexColor);
+
+                    // Set the repeated pixel in MemoryStream
+                    for (int cRepeat = 0; cRepeat < fRepeat; cRepeat++)
+                    {
+                        imageData24.Write(rgb, 0, 3);
+                    }
+
+                }
+            }
+
+            int len = (int)imageData24.Length;
+            imageData24.Close();
+
+            imageBytes = imageData24.ToArray();
+        }
 
         //Compress image binary
         if (isCompressed)
         {
-            return new PDFCompress(imageData24.ToArray()).RLECompress();
+            return new PDFCompress(imageBytes).RLECompress();
         }
         else
         {
-            return imageData24.ToArray();
+            return imageBytes;
         }
     }
-	
+
 	// converts a hexadecimal colour string to it's respective byte value
     private byte[] hexToBytes(string strHex)
     {
@@ -1784,15 +1821,15 @@ public class FCPDFGenerator
 
 /// <summary>
 /// This is an ad-hoc class to compress PDF stream.
-/// Currently this class compresses binary (byte) stream using RLE which 
+/// Currently this class compresses binary (byte) stream using RLE which
 /// PDF 1.3 specification has thus formulated:
-/// 
-/// The RunLengthDecode filter decodes data that has been encoded in a simple 
-/// byte-oriented format based on run length. The encoded data is a sequence of 
-/// runs, where each run consists of a length byte followed by 1 to 128 bytes of data. If 
-/// the length byte is in the range 0 to 127, the following length + 1 (1 to 128) bytes 
-/// are copied literally during decompression. If length is in the range 129 to 255, the 
-/// following single byte is to be copied 257 - length (2 to 128) times during decompression. 
+///
+/// The RunLengthDecode filter decodes data that has been encoded in a simple
+/// byte-oriented format based on run length. The encoded data is a sequence of
+/// runs, where each run consists of a length byte followed by 1 to 128 bytes of data. If
+/// the length byte is in the range 0 to 127, the following length + 1 (1 to 128) bytes
+/// are copied literally during decompression. If length is in the range 129 to 255, the
+/// following single byte is to be copied 257 - length (2 to 128) times during decompression.
 /// A length value of 128 denotes EOD.
 /// 
 /// The chart image compression ratio comes to around 10:3 
@@ -1875,15 +1912,15 @@ public class PDFCompress
             // if both are same there is scope for repitition
             if (preByte == postByte)
             {
-                // but flush the non repeatable data (if present) to compressed stream 
-                if (NoRepeat.Length > 0) WriteNoRepeater(NoRepeat); 
+                // but flush the non repeatable data (if present) to compressed stream
+                if (NoRepeat.Length > 0) WriteNoRepeater(NoRepeat);
 
                 // increase repeat count
                 _RL++;
-                
-                // if repeat count reaches limit of repeat i.e. 128 
+
+                // if repeat count reaches limit of repeat i.e. 128
                 // write the repeat data and reset the repeat counter
-                if (_RL > 128) _RL = WriteRunLength(_RL-1,preByte); 
+                if (_RL > 128) _RL = WriteRunLength(_RL-1,preByte);
 
             }
             else
@@ -1895,30 +1932,30 @@ public class PDFCompress
 
                 // write repeated length and byte (if present ) to output stream
                 if (_RL > 1)  _RL = WriteRunLength(_RL, preByte);
-                
+
                 // write non repeatable data to out put stream if the length reaches limit
-                if (NoRepeat.Length == 128) WriteNoRepeater(NoRepeat); 
+                if (NoRepeat.Length == 128) WriteNoRepeater(NoRepeat);
             }
         }
-  
-        // at the end of iteration 
+
+        // at the end of iteration
         // take care of the last byte
 
-        // if repeated 
-        if (_RL > 1) 
+        // if repeated
+        if (_RL > 1)
         {
             // write run length and byte (if present ) to output stream
-            _RL = WriteRunLength(_RL, preByte); 
+            _RL = WriteRunLength(_RL, preByte);
         }
         else
         {
             // if non repeated byte is left behind
-            // write non repeatable data to output stream 
+            // write non repeatable data to output stream
             NoRepeat.WriteByte(postByte);
             WriteNoRepeater(NoRepeat);
         }
 
-        
+
         // wrote EOD
         _Compressed.WriteByte((byte)128);
 
